@@ -20,7 +20,7 @@ return new class extends Migration
 
         foreach ($this->columns as $column) {
             if (Schema::hasColumn('users', $column)) {
-                // Column change through doctrine/dbal, works on MySQL, MariaDB, PostgreSQL and SQLite
+                // Native column modification (Laravel 11+), works on MySQL, MariaDB, PostgreSQL and SQLite
                 Schema::table('users', fn ($table) => $table->text($column)->nullable()->change());
             } else {
                 Schema::table('users', fn ($table) => $table->text($column)->nullable());

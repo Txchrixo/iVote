@@ -11,8 +11,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/status-proof%20of%20concept-orange" alt="Proof of concept">
-  <img src="https://img.shields.io/badge/PHP-8.1%2B-777bb4" alt="PHP 8.1+">
-  <img src="https://img.shields.io/badge/Laravel-10-ff2d20" alt="Laravel 10">
+  <img src="https://img.shields.io/badge/PHP-8.1%20%E2%86%92%208.2%2B-777bb4" alt="PHP 8.1, upgraded to 8.2+">
+  <img src="https://img.shields.io/badge/Laravel-10%20%E2%86%92%2012-ff2d20" alt="Laravel 10, upgraded to 12">
   <img src="https://img.shields.io/badge/Bitcoin-testnet-f7931a" alt="Bitcoin testnet">
   <img src="https://img.shields.io/badge/anonymity-ring%20signatures-7c5aed" alt="Ring signatures">
   <img src="https://img.shields.io/badge/license-GPL--3.0-blue" alt="GPL-3.0">
@@ -377,16 +377,17 @@ The analysis follows the 2TUP process with UML. Click a diagram to open it full 
 
 ### Stack
 
-The thesis version runs on WampServer (Apache and MySQL).
+The thesis version (July 2023) ran on WampServer. The code was later upgraded to the current
+Laravel release and hardened; the protocol and the screens did not change.
 
-| Layer | Choice |
-|---|---|
-| Back end | PHP 8.1, Laravel 10, MySQL 8 on WampServer (Apache) |
-| Front end | Blade, Bootstrap 5.3, jQuery 3.7, Vite 4, Chartist |
-| Blockchain | Bitcoin testnet (`OP_RETURN`), BitcoinECDSA, Block.io, CryptoAPIs, Ethereum and Solana balances |
-| Cryptography | LSAG on secp256k1 (`@noble/curves`), authority keys encrypted at rest (AES-256) |
-| Identity and access | Veriff, TOTP 2FA, role gates, CSP with nonces, rate limits, audit log |
-| Method | 2TUP, UML (Visual Paradigm), Figma mock-ups, automated feature tests |
+| Layer | Thesis version (2023) | Current version |
+|---|---|---|
+| Back end | PHP 8.1, Laravel 10, MySQL 8 on WampServer (Apache) | PHP 8.2+, Laravel 12, MySQL 8 |
+| Front end | Blade, Bootstrap 5.3, jQuery 3.7, Vite 4, Chartist | same, Vite 6 |
+| Blockchain | Bitcoin testnet (`OP_RETURN`), BitcoinECDSA, BitcoinJS, Block.io, SoChain API | Block.io, CryptoAPIs (SoChain's free API was retired), Ethereum and Solana balances |
+| Cryptography | RST ring signatures, RSA-1024 voter keys, secp256k1 Bitcoin keys | LSAG on secp256k1 (`@noble/curves`), authority keys encrypted at rest (AES-256) |
+| Identity and access | Veriff, password sign-in for the authorities | Veriff, TOTP 2FA, role gates, CSP with nonces, rate limits, audit log |
+| Method | 2TUP, UML (Visual Paradigm), Figma mock-ups | same, automated feature tests |
 
 <p align="center"><img src="docs/diagrams/tools.jpg" alt="Tools used" width="640"></p>
 
@@ -409,7 +410,7 @@ Surveys [12–15] cover the wider landscape and its open problems (scalability, 
 
 ## Getting started
 
-Requirements: PHP 8.1+ with `gmp`, Composer, Node 18+, MySQL 8.
+Requirements: PHP 8.2+ with `gmp`, Composer, Node 18+, MySQL 8.
 
 ```bash
 git clone https://github.com/Txchrixo/iVote.git && cd iVote
