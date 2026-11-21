@@ -16,7 +16,6 @@
   <img src="https://img.shields.io/badge/Bitcoin-testnet-f7931a" alt="Bitcoin testnet">
   <img src="https://img.shields.io/badge/anonymity-ring%20signatures-7c5aed" alt="Ring signatures">
   <img src="https://img.shields.io/badge/license-GPL--3.0-blue" alt="GPL-3.0">
-  <img src="https://img.shields.io/badge/DOI-pending-lightgrey" alt="DOI pending">
 </p>
 
 <p align="center">
@@ -37,13 +36,12 @@
 | | |
 |---|---|
 | **Author** | NANA TCHOUNKEU Thierry Christian |
-| **Academic supervisor** | [Dr. Jean de Dieu NKAPKOP](https://orcid.org/0000-0001-7736-5145), University of Douala |
+| **Academic supervisor** | [Dr. Jean de Dieu NKAPKOP](https://orcid.org/0000-0001-7736-5145) [<img src="docs/assets/orcid.svg" alt="ORCID iD" width="16" height="16">](https://orcid.org/0000-0001-7736-5145), University of Douala |
 | **Professional supervisor** | Mr. DJIMELI Christian |
 | **Degree** | Licence de Technologie, Software Engineering |
 | **Institution** | Institut Universitaire de Technologie (IUT), University of Douala |
-| **Host company** | CODEC group, Douala |
+| **Host company** | CODEC, Douala |
 | **Year** | 2023 |
-| **Thesis** | Zenodo, DOI to be added on publication |
 | **Defense slides** | [PDF, 41 slides](docs/slides/ivote-defense-2023.pdf) |
 
 ## Abstract
@@ -57,21 +55,31 @@ the same voter, and the public ledger lets every voter confirm their ballot was 
 unchanged, while organisers can neither alter results nor see voters' identities.
 
 The system was modelled with UML following the 2TUP process and built with PHP, Laravel
-and MySQL. It extends the BlockVotes design [8] with remote identity verification (Veriff),
-two-factor authentication for the authorities and an auditable election life cycle, and
-adapts it to the Cameroonian electoral context.
+and MySQL. It follows the ring-signature voting approach of Wu [8] and goes further: remote
+identity verification, linkable ring signatures, hardened authority accounts and an auditable
+election life cycle, designed around the Cameroonian electoral context.
 
 <p align="center">
   <img src="docs/slides/02-idea.jpg" alt="E-voting + Blockchain + Ring signature = IVote" width="720">
 </p>
 
+### Contributions
+
+1. **A process built for Cameroon**: identity checked remotely on Cameroonian documents with Veriff,
+   a hand-off to the voter's phone, distinct election and registration authorities, a bilingual interface.
+2. **A security review of the reused ring signature**: the RSA-based scheme could be forged with public
+   keys only (20 forgeries out of 20), and a reproducible attack is provided.
+3. **Linkable ring signatures** (LSAG on secp256k1) in its place, with a test suite: one ballot per voter
+   is enforced by cryptography rather than by bookkeeping.
+4. **A revised protocol**: voter addresses no longer tied to identities, a tally rule based on key images,
+   a 68-byte `OP_RETURN` commitment and fees that follow the network.
+5. **A hardened back office**: TOTP two-factor sign-in, role gates, nonce-based CSP, rate limits, audit log.
+6. **An evaluation**: signing and verification cost by ring size, on-chain cost per ballot, a threat model.
+
 ## Adapting the design to Cameroon
 
-<img src="docs/assets/cameroon.svg" alt="Flag of Cameroon" width="60" align="right">
-
-BlockVotes [8] was designed for a university setting with pre-issued ballot codes. IVote keeps its
-cryptographic core and reshapes the surrounding process around how elections are organised
-in Cameroon:
+Earlier blockchain voting prototypes [7, 8] target boardrooms or university elections with
+pre-issued ballot codes. IVote is designed around how elections are organised in Cameroon:
 
 | Cameroonian reality | What IVote does |
 |---|---|
@@ -127,7 +135,7 @@ wiring it into the ballot page in place of the 2023 code is the next step.
 ### From the 2023 prototype to LSAG
 
 Reviewing the prototype for this repository showed that its ring signature, inherited from
-BlockVotes, **could be forged with public keys only**. It used the Rivest–Shamir–Tauman
+an open-source implementation [8], **could be forged with public keys only**. It used the Rivest-Shamir-Tauman
 construction [2] with RSA-1024 keys but a common domain of `L = 1024` bits. RST require
 `L ≥ |n| + 160`, because their extended trapdoor `g` is the identity on
 `[⌊(2^L−1)/n⌋·n, 2^L)`; with `L = |n|` that zone is large, and a forger closes the ring there
@@ -299,7 +307,7 @@ Screens below come from the demo data set (`DemoSeeder`); wallet balances are mo
   </tr>
   <tr>
     <td align="center"><b>5.</b> Ballot and voter identity (2023 prototype)</td>
-    <td align="center"><b>5–7.</b> Ring signature, verification, results (2023 prototype)</td>
+    <td align="center"><b>5-7.</b> Ring signature, verification, results (2023 prototype)</td>
   </tr>
 </table>
 
@@ -406,14 +414,14 @@ public blockchain as the bulletin board.
 | Chirotonia [11] | 2021 | Ethereum | linkable ring signatures | smart contract | registered voters |
 | **IVote** | 2023 | Bitcoin testnet | linkable ring signatures | public, off-chain | Veriff on Cameroonian ID + email link |
 
-Surveys [12–15] cover the wider landscape and its open problems (scalability, coercion, usability).
+Surveys [12-15] cover the wider landscape and its open problems (scalability, coercion, usability).
 
 ## Getting started
 
 Requirements: PHP 8.2+ with `gmp`, Composer, Node 18+, MySQL 8.
 
 ```bash
-git clone https://github.com/Txchrixo/iVote.git && cd iVote
+git clone https://github.com/Txchrixo/IVOTE.git && cd IVOTE
 composer install && npm install
 cp .env.example .env && php artisan key:generate
 php artisan migrate --seed    # creates the EA and RA accounts, prints their passwords
@@ -482,28 +490,28 @@ If you build on this work, please cite the thesis. GitHub also offers a citation
 ## References
 
 1. S. Nakamoto. *Bitcoin: A Peer-to-Peer Electronic Cash System*. 2008.
-2. R. L. Rivest, A. Shamir, Y. Tauman. *How to Leak a Secret*. ASIACRYPT 2001, LNCS 2248, pp. 552–565. [doi:10.1007/3-540-45682-1_32](https://doi.org/10.1007/3-540-45682-1_32)
+2. R. L. Rivest, A. Shamir, Y. Tauman. *How to Leak a Secret*. ASIACRYPT 2001, LNCS 2248, pp. 552-565. [doi:10.1007/3-540-45682-1_32](https://doi.org/10.1007/3-540-45682-1_32)
 3. J. K. Liu, V. K. Wei, D. S. Wong. *Linkable Spontaneous Anonymous Group Signature for Ad Hoc Groups*. ACISP 2004, LNCS 3108.
 4. B. Adida. *Helios: Web-based Open-Audit Voting*. USENIX Security Symposium, 2008.
 5. F. Hao, P. Y. A. Ryan, P. Zieliński. *Anonymous Voting by Two-Round Public Discussion*. IET Information Security 4(2), 2010.
-6. Z. Zhao, T.-H. H. Chan. *How to Vote Privately Using Bitcoin*. ICICS 2015, LNCS 9543, pp. 82–96. [ePrint 2015/1007](https://eprint.iacr.org/2015/1007)
+6. Z. Zhao, T.-H. H. Chan. *How to Vote Privately Using Bitcoin*. ICICS 2015, LNCS 9543, pp. 82-96. [ePrint 2015/1007](https://eprint.iacr.org/2015/1007)
 7. P. McCorry, S. F. Shahandashti, F. Hao. *A Smart Contract for Boardroom Voting with Maximum Voter Privacy*. Financial Cryptography 2017. [doi:10.1007/978-3-319-70972-7_20](https://doi.org/10.1007/978-3-319-70972-7_20)
 8. Y. Wu. *An E-voting System based on Blockchain and Ring Signature* (BlockVotes). MSc thesis, University of Birmingham, 2017. [github.com/yfgeek/BlockVotes](https://github.com/yfgeek/BlockVotes)
-9. F. Þ. Hjálmarsson, G. K. Hreiðarsson, M. Hamdaqa, G. Hjálmtýsson. *Blockchain-Based E-Voting System*. IEEE CLOUD 2018, pp. 983–986. [doi:10.1109/CLOUD.2018.00151](https://doi.org/10.1109/CLOUD.2018.00151)
+9. F. Þ. Hjálmarsson, G. K. Hreiðarsson, M. Hamdaqa, G. Hjálmtýsson. *Blockchain-Based E-Voting System*. IEEE CLOUD 2018, pp. 983-986. [doi:10.1109/CLOUD.2018.00151](https://doi.org/10.1109/CLOUD.2018.00151)
 10. B. Yu, J. K. Liu, A. Sakzad, S. Nepal, R. Steinfeld, P. Rimba, M. H. Au. *Platform-Independent Secure Blockchain-Based Voting System*. ISC 2018. [doi:10.1007/978-3-319-99136-8_20](https://doi.org/10.1007/978-3-319-99136-8_20)
-11. A. Russo, A. Fernández Anta, M. I. González Vasco, S. P. Romano. *Chirotonia: A Scalable and Secure e-Voting Framework based on Blockchains and Linkable Ring Signatures*. IEEE Blockchain 2021, pp. 417–424. [arXiv:2111.02257](https://arxiv.org/abs/2111.02257)
+11. A. Russo, A. Fernández Anta, M. I. González Vasco, S. P. Romano. *Chirotonia: A Scalable and Secure e-Voting Framework based on Blockchains and Linkable Ring Signatures*. IEEE Blockchain 2021, pp. 417-424. [arXiv:2111.02257](https://arxiv.org/abs/2111.02257)
 12. J. Huang, D. He, M. S. Obaidat, P. Vijayakumar, M. Luo, K.-K. R. Choo. *The Application of the Blockchain Technology in Voting Systems: A Review*. ACM Computing Surveys 54(3), 2021.
 13. M. Benabdallah, A. Audras, L. Coudert, N. El Madhoun, M. Badra. *Analysis of Blockchain Solutions for E-Voting: A Systematic Literature Review*. IEEE Access 10, 2022. [doi:10.1109/ACCESS.2022.3187688](https://doi.org/10.1109/ACCESS.2022.3187688)
 14. U. Jafar, M. J. Ab Aziz, Z. Shukur, H. A. Hussain. *A Systematic Literature Review and Meta-Analysis on Scalable Blockchain-Based Electronic Voting Systems*. Sensors 22(19), 2022. [doi:10.3390/s22197585](https://doi.org/10.3390/s22197585)
-15. V. Vladucu, Z. Dong, J. Medina, R. Rojas-Cessa. *E-Voting Meets Blockchain: A Survey*. IEEE Access 11, pp. 23293–23308, 2023. [doi:10.1109/ACCESS.2023.3253682](https://doi.org/10.1109/ACCESS.2023.3253682)
+15. V. Vladucu, Z. Dong, J. Medina, R. Rojas-Cessa. *E-Voting Meets Blockchain: A Survey*. IEEE Access 11, pp. 23293-23308, 2023. [doi:10.1109/ACCESS.2023.3253682](https://doi.org/10.1109/ACCESS.2023.3253682)
 16. A. Faz-Hernández, S. Scott, N. Sullivan, R. S. Wahby, C. A. Wood. *Hashing to Elliptic Curves*. RFC 9380, IETF, 2023. [doi:10.17487/RFC9380](https://doi.org/10.17487/RFC9380)
 
 ## Acknowledgments
 
-[Dr. Jean de Dieu NKAPKOP](https://orcid.org/0000-0001-7736-5145) for the academic supervision, Mr. DJIMELI Christian and the CODEC team for
-the internship and their blockchain expertise. IVote started from Yifan Wu's BlockVotes [8]
-and relies on the BitcoinECDSA.php library.
+[Dr. Jean de Dieu NKAPKOP](https://orcid.org/0000-0001-7736-5145) [<img src="docs/assets/orcid.svg" alt="ORCID iD" width="16" height="16">](https://orcid.org/0000-0001-7736-5145) for the academic supervision, Mr. DJIMELI Christian and the CODEC team for
+the internship and their blockchain expertise. The first prototype reused parts of Yifan Wu's
+open-source BlockVotes [8]; IVote also relies on BitcoinECDSA.php and the noble cryptography libraries.
 
 ## License
 
-[GPL-3.0](LICENSE), inherited from BlockVotes [8].
+[GPL-3.0](LICENSE), as required by the open-source code reused in the first prototype [8].
